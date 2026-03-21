@@ -1,0 +1,301 @@
+[
+  {
+    "id": "ref_seed_001",
+    "name": "Cloud Service Type Taxonomy",
+    "description": "A hierarchical taxonomy for classifying cloud-native service types in modern distributed systems, covering deployment models, runtime environments, and management tiers.",
+    "type": "taxonomy",
+    "tags": [
+      "cloud",
+      "service",
+      "platform",
+      "taxonomy"
+    ],
+    "version": "1.0.0",
+    "createdAt": "2024-01-15T10:00:00.000Z",
+    "updatedAt": "2024-01-15T10:00:00.000Z",
+    "nodes": [
+      {
+        "id": "n1",
+        "name": "Compute Services",
+        "description": "Services that provide computing capacity",
+        "type": "category",
+        "children": [
+          {
+            "id": "n1a",
+            "name": "Containerized Services",
+            "description": "Services packaged and run in containers",
+            "type": "subcategory",
+            "children": [
+              {
+                "id": "n1a1",
+                "name": "Microservice",
+                "description": "Small, independently deployable service with a single responsibility",
+                "type": "leaf",
+                "value": "runtime: container\nscaling: horizontal\norchestration: kubernetes",
+                "children": []
+              },
+              {
+                "id": "n1a2",
+                "name": "Sidecar",
+                "description": "Auxiliary container that extends the primary service",
+                "type": "leaf",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "n1b",
+            "name": "Serverless Functions",
+            "description": "Event-driven functions with no server management",
+            "type": "subcategory",
+            "children": [
+              {
+                "id": "n1b1",
+                "name": "HTTP Function",
+                "description": "Function triggered by HTTP requests",
+                "type": "leaf",
+                "children": []
+              },
+              {
+                "id": "n1b2",
+                "name": "Event Function",
+                "description": "Function triggered by event bus messages",
+                "type": "leaf",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "n2",
+        "name": "Data Services",
+        "description": "Services that provide data storage and retrieval",
+        "type": "category",
+        "children": [
+          {
+            "id": "n2a",
+            "name": "Relational Database",
+            "description": "ACID-compliant relational database service",
+            "type": "leaf",
+            "children": []
+          },
+          {
+            "id": "n2b",
+            "name": "Document Store",
+            "description": "NoSQL document-oriented database",
+            "type": "leaf",
+            "children": []
+          },
+          {
+            "id": "n2c",
+            "name": "Message Broker",
+            "description": "Asynchronous message routing and queuing service",
+            "type": "leaf",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ref_seed_002",
+    "name": "HTTP Status Code Schema",
+    "description": "A machine-readable schema defining standard HTTP response status codes, their categories, and semantic meanings for use in API documentation and error handling.",
+    "type": "schema",
+    "tags": [
+      "api",
+      "http",
+      "rest",
+      "schema"
+    ],
+    "version": "1.0.0",
+    "createdAt": "2024-01-20T09:00:00.000Z",
+    "updatedAt": "2024-01-20T09:00:00.000Z",
+    "nodes": [
+      {
+        "id": "s1",
+        "name": "2xx Success",
+        "description": "Codes indicating successful request processing",
+        "type": "group",
+        "children": [
+          {
+            "id": "s1a",
+            "name": "200 OK",
+            "description": "The request has succeeded",
+            "type": "code",
+            "value": "200",
+            "children": []
+          },
+          {
+            "id": "s1b",
+            "name": "201 Created",
+            "description": "The request has been fulfilled and a new resource has been created",
+            "type": "code",
+            "value": "201",
+            "children": []
+          },
+          {
+            "id": "s1c",
+            "name": "204 No Content",
+            "description": "The server has fulfilled the request but does not need to return a body",
+            "type": "code",
+            "value": "204",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "name": "4xx Client Errors",
+        "description": "Codes indicating client-side request errors",
+        "type": "group",
+        "children": [
+          {
+            "id": "s2a",
+            "name": "400 Bad Request",
+            "description": "The server could not understand the request due to invalid syntax",
+            "type": "code",
+            "value": "400",
+            "children": []
+          },
+          {
+            "id": "s2b",
+            "name": "401 Unauthorized",
+            "description": "Authentication is required and has failed or not been provided",
+            "type": "code",
+            "value": "401",
+            "children": []
+          },
+          {
+            "id": "s2c",
+            "name": "404 Not Found",
+            "description": "The requested resource could not be found",
+            "type": "code",
+            "value": "404",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "name": "5xx Server Errors",
+        "description": "Codes indicating server-side errors",
+        "type": "group",
+        "children": [
+          {
+            "id": "s3a",
+            "name": "500 Internal Server Error",
+            "description": "The server encountered an unexpected condition",
+            "type": "code",
+            "value": "500",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ref_seed_003",
+    "name": "Domain Event Ontology",
+    "description": "An ontology defining the structure and relationships of domain events in an event-driven architecture, including event types, payloads, routing, and lifecycle states.",
+    "type": "ontology",
+    "tags": [
+      "event",
+      "domain",
+      "ontology",
+      "messaging",
+      "architecture"
+    ],
+    "version": "2.1.0",
+    "createdAt": "2024-02-01T08:00:00.000Z",
+    "updatedAt": "2024-03-10T14:30:00.000Z",
+    "nodes": [
+      {
+        "id": "e1",
+        "name": "DomainEvent",
+        "description": "Base concept for all domain events in the system",
+        "type": "class",
+        "children": [
+          {
+            "id": "e1a",
+            "name": "eventId",
+            "description": "Unique identifier for this event instance",
+            "type": "property",
+            "value": "type: UUID\nrequired: true",
+            "children": []
+          },
+          {
+            "id": "e1b",
+            "name": "occurredAt",
+            "description": "ISO-8601 timestamp when the event occurred",
+            "type": "property",
+            "value": "type: datetime\nrequired: true",
+            "children": []
+          },
+          {
+            "id": "e1c",
+            "name": "aggregateId",
+            "description": "ID of the aggregate root that emitted the event",
+            "type": "property",
+            "value": "type: string\nrequired: true",
+            "children": []
+          },
+          {
+            "id": "e1d",
+            "name": "CommandEvent",
+            "description": "Event expressing intent to perform an action",
+            "type": "subclass",
+            "children": [
+              {
+                "id": "e1d1",
+                "name": "correlationId",
+                "description": "Links this command to its originating request",
+                "type": "property",
+                "value": "type: UUID\nrequired: false",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "e1e",
+            "name": "FactEvent",
+            "description": "Event recording that something has happened (immutable fact)",
+            "type": "subclass",
+            "children": [
+              {
+                "id": "e1e1",
+                "name": "version",
+                "description": "Sequence version of this event for the aggregate",
+                "type": "property",
+                "value": "type: integer\nrequired: true",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ref_1774085764635_cmosgsp",
+    "name": "Test Reference",
+    "description": "A test reference entry",
+    "type": "model",
+    "tags": [
+      "test",
+      "api"
+    ],
+    "nodes": [
+      {
+        "id": "t1",
+        "name": "Root",
+        "type": "root",
+        "children": []
+      }
+    ],
+    "createdAt": "2026-03-21T09:36:04.635Z",
+    "updatedAt": "2026-03-21T09:36:04.635Z",
+    "version": "1.0.0"
+  }
+]
