@@ -1,0 +1,734 @@
+{
+  "$schema": "https://reference-catalog.io/schema/v1",
+  "id": "ref_1774741959945_abeagbk",
+  "name": "simple-llm-models-taxonomy-2026-03",
+  "description": "A practical taxonomy of widely used LLM-related models.",
+  "type": "taxonomy",
+  "version": "1.0.0",
+  "tags": [
+    "llm",
+    "models",
+    "taxonomy",
+    "providers",
+    "selection",
+    "capabilities",
+    "openai",
+    "anthropic",
+    "claude"
+  ],
+  "createdAt": "2026-03-28T23:52:39.945Z",
+  "updatedAt": "2026-03-28T23:52:39.945Z",
+  "nodes": [
+    {
+      "id": "h208t4db",
+      "name": "providers",
+      "type": "provider-taxonomy",
+      "description": "Top-level grouping: all models are organized under their provider.",
+      "children": [
+        {
+          "id": "w2asdc6b",
+          "name": "openai",
+          "type": "provider",
+          "description": "OpenAI model catalog grouped by family and utility class (LLMs, embeddings, moderation).",
+          "children": [
+            {
+              "id": "oz57oqow",
+              "name": "llm-families",
+              "type": "llm-family-taxonomy",
+              "description": "OpenAI LLM families used for chat, coding, reasoning, and multimodal tasks.",
+              "children": [
+                {
+                  "id": "ulyyu4sh",
+                  "name": "gpt-family",
+                  "type": "provider-family",
+                  "description": "General-purpose GPT models used for chat, instruction following, tool use, and multimodal tasks.",
+                  "children": [
+                    {
+                      "id": "le7z9bqb",
+                      "name": "gpt-4.1",
+                      "type": "llm-family",
+                      "description": "Flagship GPT family variant commonly used for high-quality generation, coding, and complex instruction following.",
+                      "children": [
+                        {
+                          "id": "s12jcege",
+                          "name": "gpt-4.1",
+                          "type": "llm-model",
+                          "description": "Primary flagship variant.",
+                          "value": "stable",
+                          "children": []
+                        },
+                        {
+                          "id": "fcb68wre",
+                          "name": "gpt-4.1-mini",
+                          "type": "llm-model",
+                          "description": "Cost-optimized smaller variant for high-throughput chat, extraction, and lightweight coding.",
+                          "value": "stable",
+                          "children": []
+                        },
+                        {
+                          "id": "z9zck4vh",
+                          "name": "gpt-4.1-nano",
+                          "type": "llm-model",
+                          "description": "Fastest and cheapest GPT-4.1 variant. 1M token context window. Optimised for classification, autocompletion, instruction following, and tool calling. Beats GPT-4o mini on key benchmarks. API-only (not available in ChatGPT).",
+                          "value": "stable",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "20c07i9e",
+                      "name": "gpt-4o",
+                      "type": "llm-family",
+                      "description": "Omni/multimodal GPT model family commonly used for text + vision and interactive assistants.",
+                      "children": [
+                        {
+                          "id": "k2i8ozid",
+                          "name": "gpt-4o",
+                          "type": "llm-model",
+                          "description": "High-capability multimodal model for text and vision tasks.",
+                          "value": "stable",
+                          "children": []
+                        },
+                        {
+                          "id": "zadwyny3",
+                          "name": "gpt-4o-mini",
+                          "type": "llm-model",
+                          "description": "Lower-cost multimodal model for fast assistants, summarization, and basic vision understanding.",
+                          "value": "stable",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "k9cnq06m",
+                      "name": "gpt-4-turbo",
+                      "type": "llm-family",
+                      "description": "Prior-generation high-capability GPT-4 variant often referenced in existing systems.",
+                      "children": [
+                        {
+                          "id": "izrgkddt",
+                          "name": "gpt-4-turbo",
+                          "type": "llm-model",
+                          "description": "High-quality model used for chat and tool use; commonly treated as legacy/transition depending on availability.",
+                          "value": "legacy",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "egwym0l9",
+                      "name": "gpt-3.5",
+                      "type": "llm-family",
+                      "description": "Older, cost-effective text-only family widely used historically for chat and classification.",
+                      "children": [
+                        {
+                          "id": "cml18nv5",
+                          "name": "gpt-3.5-turbo",
+                          "type": "llm-model",
+                          "description": "Popular legacy chat model for basic assistants and extraction; often replaced by newer mini variants.",
+                          "value": "legacy",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "bhezawij",
+                  "name": "o-series-family",
+                  "type": "provider-family",
+                  "description": "Reasoning-optimized models used for complex multi-step problem solving, planning, and hard coding tasks.",
+                  "children": [
+                    {
+                      "id": "6q4o9dja",
+                      "name": "o1",
+                      "type": "llm-family",
+                      "description": "High-end reasoning model family for difficult tasks requiring deeper deliberation.",
+                      "children": [
+                        {
+                          "id": "wmr79lqo",
+                          "name": "o1",
+                          "type": "llm-model",
+                          "description": "Primary reasoning model for maximum quality on hard tasks.",
+                          "value": "stable",
+                          "children": []
+                        },
+                        {
+                          "id": "qx0kweic",
+                          "name": "o1-mini",
+                          "type": "llm-model",
+                          "description": "Faster, cheaper reasoning model for moderate complexity tasks and higher throughput.",
+                          "value": "stable",
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "id": "ooxrqitx",
+                      "name": "o3",
+                      "type": "llm-family",
+                      "description": "Next-generation reasoning family positioned for strong reasoning and tool use.",
+                      "children": [
+                        {
+                          "id": "fi7ijw3l",
+                          "name": "o3",
+                          "type": "llm-model",
+                          "description": "Primary o3 reasoning model.",
+                          "value": "preview",
+                          "children": []
+                        },
+                        {
+                          "id": "d2ixyh57",
+                          "name": "o3-mini",
+                          "type": "llm-model",
+                          "description": "Cost-optimized o3 variant for faster reasoning workloads.",
+                          "value": "preview",
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "a9q6y9k1",
+                  "name": "gpt-5.x-family",
+                  "type": "provider-family",
+                  "description": "Latest 5.x generation GPT family models, positioned above 4.x. Reasoning-class models that follow o-series API conventions.",
+                  "children": [
+                    {
+                      "id": "7xq0ctmz",
+                      "name": "gpt-5",
+                      "type": "llm-family",
+                      "description": "Primary 5.x flagship variant.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "cehtjju2",
+                      "name": "gpt-5-mini",
+                      "type": "llm-family",
+                      "description": "Cost-optimized 5.x variant for high-throughput assistants, extraction, and lightweight coding.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "guhd6iry",
+                      "name": "gpt-5-nano",
+                      "type": "llm-family",
+                      "description": "Fastest, most cost-efficient GPT-5 variant. Optimised for classification, data extraction, ranking, and sub-agent workloads where speed and cost matter most. API-only.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "xe3t42fz",
+                      "name": "gpt-5.1",
+                      "type": "llm-family",
+                      "description": "Incremental 5.x revision. reasoning_effort defaults to none — must be set explicitly to enable reasoning.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "n7ws3wa2",
+                      "name": "gpt-5.1-mini",
+                      "type": "llm-family",
+                      "description": "Cost-optimized 5.1 variant.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "v8q19lru",
+                      "name": "gpt-5.2",
+                      "type": "llm-family",
+                      "description": "Incremental 5.x revision.",
+                      "value": "preview",
+                      "children": []
+                    },
+                    {
+                      "id": "79r4emyf",
+                      "name": "gpt-5.4",
+                      "type": "llm-family",
+                      "description": "Incremental 5.x revision.",
+                      "children": []
+                    },
+                    {
+                      "id": "ui6e4uce",
+                      "name": "gpt-5.4-mini",
+                      "type": "llm-family",
+                      "description": "Cost-optimised GPT-5.4 variant. Significantly faster than GPT-5.4 (2x+). Approaches GPT-5.4 on SWE-Bench Pro and OSWorld-Verified. Handles coding, tool use, multimodal, and sub-agent workloads. Available in ChatGPT Free and Go tiers.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "kcz8lsqv",
+                      "name": "gpt-5.4-nano",
+                      "type": "llm-family",
+                      "description": "Fastest and cheapest GPT-5.4 variant. Designed for classification, data extraction, ranking, and sub-agent tasks where latency and cost are the primary constraints. API-only (not in ChatGPT consumer app).",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "5u3ewvf5",
+          "name": "anthropic",
+          "type": "provider",
+          "description": "Anthropic Claude model families.",
+          "children": [
+            {
+              "id": "375q4kae",
+              "name": "llm-families",
+              "type": "llm-family-taxonomy",
+              "description": "Anthropic Claude families grouped by generation and tier.",
+              "children": [
+                {
+                  "id": "wdz02dm0",
+                  "name": "claude-3-family",
+                  "type": "provider-family",
+                  "description": "Claude 3 generation models. Legacy; superseded by 3.5 and later.",
+                  "children": [
+                    {
+                      "id": "8a8mzdri",
+                      "name": "claude-3-opus",
+                      "type": "llm-model",
+                      "description": "Highest-capability Claude 3 tier. Retired/deprecated.",
+                      "value": "legacy",
+                      "children": []
+                    },
+                    {
+                      "id": "evcdph6b",
+                      "name": "claude-3-sonnet",
+                      "type": "llm-model",
+                      "description": "Balanced Claude 3 tier. Legacy; superseded by claude-3.5-sonnet.",
+                      "value": "legacy",
+                      "children": []
+                    },
+                    {
+                      "id": "142w1mc0",
+                      "name": "claude-3-haiku",
+                      "type": "llm-model",
+                      "description": "Fast, lower-cost Claude 3 tier. Legacy; superseded by claude-3.5-haiku.",
+                      "value": "legacy",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "jjlc1e6w",
+                  "name": "claude-3.5-family",
+                  "type": "provider-family",
+                  "description": "Claude 3.5 generation models.",
+                  "children": [
+                    {
+                      "id": "c0zsf9kt",
+                      "name": "claude-3.5-sonnet",
+                      "type": "llm-model",
+                      "description": "Strong coding and general assistant quality; widely used production model.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "96wzkklo",
+                      "name": "claude-3.5-haiku",
+                      "type": "llm-model",
+                      "description": "Faster, cost-optimized tier for throughput-sensitive assistants and extraction.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "5dvl03r0",
+                  "name": "claude-3.7-family",
+                  "type": "provider-family",
+                  "description": "Claude 3.7 generation; introduced hybrid/extended thinking.",
+                  "children": [
+                    {
+                      "id": "pn85u172",
+                      "name": "claude-3.7-sonnet",
+                      "type": "llm-model",
+                      "description": "Hybrid-reasoning Sonnet model; supports extended thinking mode.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "640x8706",
+                  "name": "claude-4-family",
+                  "type": "provider-family",
+                  "description": "Claude 4 generation (May 2025); professional-grade coding and agent capabilities.",
+                  "children": [
+                    {
+                      "id": "rwaen0y6",
+                      "name": "claude-opus-4",
+                      "type": "llm-model",
+                      "description": "Highest-capability Claude 4 tier.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "wsg14v33",
+                      "name": "claude-sonnet-4",
+                      "type": "llm-model",
+                      "description": "Balanced Claude 4 tier.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "vkc5k4ia",
+                      "name": "claude-haiku-4",
+                      "type": "llm-model",
+                      "description": "Fast, cost-efficient Claude 4 tier.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "52y1l2tu",
+                  "name": "claude-4.5-family",
+                  "type": "provider-family",
+                  "description": "Claude 4.5 generation (November 2025).",
+                  "children": [
+                    {
+                      "id": "zzwjhz8g",
+                      "name": "claude-opus-4.5",
+                      "type": "llm-model",
+                      "description": "Top-tier Claude 4.5 model.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "6ldbp799",
+                      "name": "claude-sonnet-4.5",
+                      "type": "llm-model",
+                      "description": "Production-default Sonnet; industry-leading coding and computer use.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "3tjkzs58",
+                      "name": "claude-haiku-4.5",
+                      "type": "llm-model",
+                      "description": "Fastest, most cost-efficient Claude 4.5 tier.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "578geiy9",
+                  "name": "claude-4.6-family",
+                  "type": "provider-family",
+                  "description": "Claude 4.6 generation (February 2026); current latest generation.",
+                  "children": [
+                    {
+                      "id": "966a6nth",
+                      "name": "claude-opus-4.6",
+                      "type": "llm-model",
+                      "description": "Most capable production model as of March 2026; adaptive thinking, 1M token context, 128k max output.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "2t4yr3ii",
+                      "name": "claude-sonnet-4.6",
+                      "type": "llm-model",
+                      "description": "Latest Sonnet; near-Opus 4.5 coding quality at Sonnet pricing. 1M context window in beta.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "htqpcaje",
+          "name": "google",
+          "type": "provider",
+          "description": "Google DeepMind Gemini model families.",
+          "children": [
+            {
+              "id": "r3gbwv34",
+              "name": "llm-families",
+              "type": "llm-family-taxonomy",
+              "description": "Gemini LLM families grouped by generation.",
+              "children": [
+                {
+                  "id": "37mqfirq",
+                  "name": "gemini-2.0-family",
+                  "type": "provider-family",
+                  "description": "Gemini 2.0 generation. Retiring June 1, 2026.",
+                  "children": [
+                    {
+                      "id": "e41t6wuy",
+                      "name": "gemini-2.0-flash",
+                      "type": "llm-model",
+                      "description": "Multimodal performance for general-purpose tasks. Retiring June 1, 2026.",
+                      "value": "legacy",
+                      "children": []
+                    },
+                    {
+                      "id": "izlho07g",
+                      "name": "gemini-2.0-flash-lite",
+                      "type": "llm-model",
+                      "description": "Streamlined, ultra-efficient variant. Retiring June 1, 2026.",
+                      "value": "legacy",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "qganfxw3",
+                  "name": "gemini-2.5-family",
+                  "type": "provider-family",
+                  "description": "Gemini 2.5 generation. Current stable production generation.",
+                  "children": [
+                    {
+                      "id": "m6kxh15a",
+                      "name": "gemini-2.5-pro",
+                      "type": "llm-model",
+                      "description": "Flagship reasoning model. 1M token input context, 65536 output.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "nhjmojxp",
+                      "name": "gemini-2.5-flash",
+                      "type": "llm-model",
+                      "description": "Optimised for low-latency, high-throughput. 1M context. Default for most developers.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "6a01x9p7",
+                      "name": "gemini-2.5-flash-lite",
+                      "type": "llm-model",
+                      "description": "Built for massive scale. Most cost-efficient 2.5 tier.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "ba25edfl",
+                  "name": "gemini-3-family",
+                  "type": "provider-family",
+                  "description": "Gemini 3 generation (late 2025–2026). Current frontier.",
+                  "children": [
+                    {
+                      "id": "wvoqco14",
+                      "name": "gemini-3.1-pro",
+                      "type": "llm-model",
+                      "description": "Latest reasoning-first flagship. Adaptive thinking, 1M context, 64k output.",
+                      "value": "preview",
+                      "children": []
+                    },
+                    {
+                      "id": "fls3pz6r",
+                      "name": "gemini-3-flash",
+                      "type": "llm-model",
+                      "description": "Frontier-class performance at a fraction of Pro cost.",
+                      "value": "preview",
+                      "children": []
+                    },
+                    {
+                      "id": "d3wza6xh",
+                      "name": "gemini-3.1-flash-lite",
+                      "type": "llm-model",
+                      "description": "Most cost-efficient Gemini 3 tier. Free tier available.",
+                      "value": "preview",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "g3kfnq9y",
+          "name": "xai",
+          "type": "provider",
+          "description": "xAI Grok model families. OpenAI-compatible API (api.x.ai).",
+          "children": [
+            {
+              "id": "wpbnp8f2",
+              "name": "llm-families",
+              "type": "llm-family-taxonomy",
+              "description": "Grok LLM families grouped by generation.",
+              "children": [
+                {
+                  "id": "kb8uaom4",
+                  "name": "grok-3-family",
+                  "type": "provider-family",
+                  "description": "Grok 3 generation (February 2025). Knowledge cutoff: November 2024.",
+                  "children": [
+                    {
+                      "id": "6dhlylow",
+                      "name": "grok-3",
+                      "type": "llm-model",
+                      "description": "Grok 3 flagship. 131072 token context.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "xqbjurje",
+                      "name": "grok-3-mini",
+                      "type": "llm-model",
+                      "description": "Cost-optimised Grok 3 variant. Supports reasoning_effort. 131072 context.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "wa6pca4u",
+                  "name": "grok-4-family",
+                  "type": "provider-family",
+                  "description": "Grok 4 generation (mid-2025). Current flagship. 2M token context. Knowledge cutoff: November 2024.",
+                  "children": [
+                    {
+                      "id": "681pm0xi",
+                      "name": "grok-4",
+                      "type": "llm-model",
+                      "description": "Grok 4 primary flagship. Deep reasoning, 2M context.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "9b8wezyw",
+                      "name": "grok-4-fast",
+                      "type": "llm-model",
+                      "description": "Non-reasoning Grok 4 variant. 40% fewer thinking tokens. 2M context.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "i8hp4irk",
+                      "name": "grok-4.1-fast",
+                      "type": "llm-model",
+                      "description": "Latest Grok 4.1 Fast. Recommended default ($0.20/$0.50 per 1M tokens). 2M context. Reasoning and non-reasoning variants.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "6kstr0fo",
+                      "name": "grok-code-fast-1",
+                      "type": "llm-model",
+                      "description": "Specialised reasoning model for agentic coding. 256k context.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "u76imr2d",
+                      "name": "grok-4.20",
+                      "type": "llm-model",
+                      "description": "Newest flagship (early access March 2026). logprobs field ignored.",
+                      "value": "preview",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "u0ox3k42",
+          "name": "deepseek",
+          "type": "provider",
+          "description": "DeepSeek model families. Open-weight and API-hosted (api.deepseek.com). OpenAI-compatible API.",
+          "children": [
+            {
+              "id": "uiw1gnnw",
+              "name": "llm-families",
+              "type": "llm-family-taxonomy",
+              "description": "DeepSeek families grouped by architecture generation.",
+              "children": [
+                {
+                  "id": "5kvd6dxb",
+                  "name": "v3-family",
+                  "type": "provider-family",
+                  "description": "DeepSeek V3 generation. General-purpose MoE (671B params, 37B activated). Non-reasoning.",
+                  "children": [
+                    {
+                      "id": "iknadig4",
+                      "name": "deepseek-v3",
+                      "type": "llm-model",
+                      "description": "Original V3 release (December 2024). Open weights. 64K context.",
+                      "value": "legacy",
+                      "children": []
+                    },
+                    {
+                      "id": "hr2jmqf5",
+                      "name": "deepseek-v3-0324",
+                      "type": "llm-model",
+                      "description": "March 2025 post-training update. Improved reasoning and tool use via R1 RL techniques.",
+                      "value": "legacy",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "32bsvxv8",
+                  "name": "r1-family",
+                  "type": "provider-family",
+                  "description": "DeepSeek R1 generation. Always-on CoT reasoning. Sampling params unsupported.",
+                  "children": [
+                    {
+                      "id": "ybicv2zx",
+                      "name": "deepseek-r1",
+                      "type": "llm-model",
+                      "description": "Original R1 (January 2025). Open weights. 64K context.",
+                      "value": "legacy",
+                      "children": []
+                    },
+                    {
+                      "id": "vj80li2v",
+                      "name": "deepseek-r1-0528",
+                      "type": "llm-model",
+                      "description": "May 2025 R1 update. Stronger reasoning. 64K context.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "id": "lkklcqhs",
+                  "name": "v3.2-family",
+                  "type": "provider-family",
+                  "description": "DeepSeek V3.2 (December 2025). Current production. Hybrid thinking/non-thinking. 128K context.",
+                  "children": [
+                    {
+                      "id": "63w4t0pf",
+                      "name": "deepseek-chat",
+                      "type": "llm-model",
+                      "description": "Stable alias for V3.2 non-thinking mode. Recommended for chat, coding, and tool workflows.",
+                      "value": "stable",
+                      "children": []
+                    },
+                    {
+                      "id": "m6updxpv",
+                      "name": "deepseek-reasoner",
+                      "type": "llm-model",
+                      "description": "Stable alias for V3.2 thinking mode. CoT in reasoning_content field. Omit temperature/sampling params.",
+                      "value": "stable",
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
