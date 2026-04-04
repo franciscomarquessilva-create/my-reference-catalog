@@ -1,9 +1,9 @@
 # PowerShell deployment script for my-reference-catalog
-# Deploys to fraserver01 via SSH
+# Deploys to a remote server via SSH
 
 param(
-    [string]$Server = "fraserver01",
-    [string]$User = "francis"
+    [string]$Server = "your-server",
+    [string]$User = "your-user"
 )
 
 $ErrorActionPreference = "Stop"
@@ -63,4 +63,4 @@ Write-Host "Running deployment on remote server..." -ForegroundColor Cyan
 ssh "$User@$Server" "bash /srv/my-reference-catalog/deploy-remote.sh"
 
 Write-Host "Deployment complete!" -ForegroundColor Green
-Write-Host "App available at: https://my-reference-catalog.aiops3000.com" -ForegroundColor Green
+Write-Host "App available at: http://$Server:3000 (or your configured hostname)" -ForegroundColor Green
