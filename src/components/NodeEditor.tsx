@@ -58,10 +58,14 @@ export default function NodeEditor({
     [node, onUpdate]
   );
 
-  const indentStyle = { marginLeft: `${depth * 20}px` };
+  const isLeaf = (node.children ?? []).length === 0;
+  const indentStyle = {
+    marginLeft: `${depth * 20}px`,
+    ...(isLeaf ? { maxWidth: "1000px" } : {}),
+  };
 
   return (
-    <div style={indentStyle} className="border border-gray-200 rounded-lg bg-gray-50">
+    <div style={indentStyle} className="border border-gray-200 rounded-lg bg-gray-50 min-w-max">
       {/* Node Header */}
       <div className="flex items-center gap-2 px-3 py-2">
         <button
@@ -89,12 +93,13 @@ export default function NodeEditor({
               placeholder="Type (e.g. entity, property)"
               className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
-            <input
-              type="text"
+            <textarea
               value={node.description ?? ""}
               onChange={(e) => update({ description: e.target.value })}
               placeholder="Description"
-              className="border border-gray-300 rounded px-2 py-1 text-sm col-span-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              rows={3}
+              style={{ maxWidth: "1000px" }}
+              className="border border-gray-300 rounded px-2 py-1 text-sm col-span-2 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y"
             />
             <input
               type="text"

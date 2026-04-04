@@ -32,6 +32,12 @@ export default function RootLayout({
                 Browse
               </Link>
               <Link
+                href="/settings"
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Settings
+              </Link>
+              <Link
                 href="/references/new"
                 className="text-sm bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
               >

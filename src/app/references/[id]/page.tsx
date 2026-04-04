@@ -4,15 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Reference, ReferenceNode } from "@/types/reference";
-
-const TYPE_COLORS: Record<string, string> = {
-  ontology: "bg-purple-100 text-purple-700",
-  taxonomy: "bg-green-100 text-green-700",
-  model: "bg-blue-100 text-blue-700",
-  schema: "bg-yellow-100 text-yellow-700",
-  configuration: "bg-orange-100 text-orange-700",
-  other: "bg-gray-100 text-gray-700",
-};
+import { TYPE_COLORS, supportsJsonExport, usesFreeTextReference } from "@/lib/reference-types";
 
 function NodeTree({ node, depth = 0 }: { node: ReferenceNode; depth?: number }) {
   const [expanded, setExpanded] = useState(true);
@@ -55,6 +47,8 @@ function NodeTree({ node, depth = 0 }: { node: ReferenceNode; depth?: number }) 
   );
 }
 
+type ReferenceDetailTab = "tree" | "content" | "json" | "markdown";
+
 export default function ReferenceDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -64,7 +58,7 @@ export default function ReferenceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState<"tree" | "json" | "markdown">("tree");
+  const [activeTab, setActiveTab] = useState<ReferenceDetailTab>("tree");
   const [exportContent, setExportContent] = useState("");
   const [exportLoading, setExportLoading] = useState(false);
 
@@ -79,7 +73,11 @@ export default function ReferenceDetailPage() {
         return r.json();
       })
       .then((data) => {
-        if (data) setRef(data as Reference);
+        if (data) {
+          const reference = data as Reference;
+          setRef(reference);
+          setActiveTab(usesFreeTextReference(reference.type) ? "content" : "tree");
+        }
         setLoading(false);
       });
   }, [id]);
@@ -97,11 +95,15 @@ export default function ReferenceDetailPage() {
     [id]
   );
 
-  useEffect(() => {
-    if (activeTab === "json" || activeTab === "markdown") {
-      loadExport(activeTab);
-    }
-  }, [activeTab, loadExport]);
+  const handleTabSelect = useCallback(
+    (tab: ReferenceDetailTab) => {
+      setActiveTab(tab);
+      if (tab === "json" || tab === "markdown") {
+        void loadExport(tab);
+      }
+    },
+    [loadExport]
+  );
 
   const handleDelete = useCallback(async () => {
     if (!confirm("Delete this reference? This cannot be undone.")) return;
@@ -131,6 +133,10 @@ export default function ReferenceDetailPage() {
   }
 
   const downloadExport = async (format: "json" | "markdown") => {
+    if (format === "json" && !supportsJsonExport(ref.type)) {
+      return;
+    }
+
     const res = await fetch(`/api/references/${id}/export?format=${format}`);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -141,8 +147,14 @@ export default function ReferenceDetailPage() {
     URL.revokeObjectURL(url);
   };
 
+  const freeTextReference = usesFreeTextReference(ref.type);
+  const jsonAvailable = supportsJsonExport(ref.type);
+  const tabs: ReferenceDetailTab[] = freeTextReference
+    ? ["content", ...(jsonAvailable ? (["json"] as ReferenceDetailTab[]) : []), "markdown"]
+    : ["tree", ...(jsonAvailable ? (["json"] as ReferenceDetailTab[]) : []), "markdown"];
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-gray-900 transition-colors">
@@ -170,12 +182,26 @@ export default function ReferenceDetailPage() {
             <p className="text-gray-600">{ref.description}</p>
           </div>
           <div className="flex flex-col gap-2 shrink-0">
+            <Link
+              href={`/references/${id}/edit`}
+              className="text-sm px-3 py-1.5 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-center"
+            >
+              Edit
+            </Link>
+            <Link
+              href={`/references/new?copyFromId=${encodeURIComponent(id)}`}
+              className="text-sm px-3 py-1.5 border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-50 transition-colors text-center"
+            >
+              Create from this reference
+            </Link>
+            {jsonAvailable && (
             <button
               onClick={() => downloadExport("json")}
               className="text-sm px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               ↓ JSON
             </button>
+            )}
             <button
               onClick={() => downloadExport("markdown")}
               className="text-sm px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -216,18 +242,48 @@ export default function ReferenceDetailPage() {
 
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="px-6 pt-4 text-sm text-gray-600 flex items-center gap-3 flex-wrap">
+          <span className="text-gray-500">Direct format URLs:</span>
+          {jsonAvailable && (
+          <>
+          <Link
+            href={`/references/${id}/json/`}
+            className="text-blue-600 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            JSON
+          </Link>
+          <span>·</span>
+          </>
+          )}
+          <Link
+            href={`/references/${id}/markdown/`}
+            className="text-blue-600 hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Markdown
+          </Link>
+        </div>
         <div className="flex border-b border-gray-200">
-          {(["tree", "json", "markdown"] as const).map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabSelect(tab)}
               className={`px-5 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab
                   ? "border-b-2 border-blue-600 text-blue-600"
                   : "text-gray-500 hover:text-gray-800"
               }`}
             >
-              {tab === "tree" ? "🌳 Tree View" : tab === "json" ? "{ } JSON" : "# Markdown"}
+              {tab === "tree"
+                ? "🌳 Tree View"
+                : tab === "content"
+                  ? "📝 Content"
+                  : tab === "json"
+                    ? "{ } JSON"
+                    : "# Markdown"}
             </button>
           ))}
         </div>
@@ -240,13 +296,21 @@ export default function ReferenceDetailPage() {
                   No nodes defined for this reference.
                 </p>
               ) : (
-                <div className="space-y-1">
-                  {ref.nodes.map((node) => (
-                    <NodeTree key={node.id} node={node} />
-                  ))}
+                <div className="overflow-x-auto">
+                  <div className="space-y-1 min-w-max">
+                    {ref.nodes.map((node) => (
+                      <NodeTree key={node.id} node={node} />
+                    ))}
+                  </div>
                 </div>
               )}
             </>
+          )}
+
+          {activeTab === "content" && (
+            <pre className="text-sm font-mono bg-gray-50 rounded-lg p-4 overflow-x-auto whitespace-pre-wrap border border-gray-200">
+              {ref.content?.trim() || "No free text content defined for this reference."}
+            </pre>
           )}
 
           {(activeTab === "json" || activeTab === "markdown") && (

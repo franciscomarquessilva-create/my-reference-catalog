@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchReferences, createReference } from "@/lib/store";
+import { validateCreateReferenceInput } from "@/lib/reference-validation";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -8,28 +9,27 @@ export async function GET(request: NextRequest) {
   const tagsParam = searchParams.get("tags");
   const tags = tagsParam ? tagsParam.split(",").filter(Boolean) : undefined;
 
-  const refs = searchReferences(q, tags, type);
+  const refs = await searchReferences(q, tags, type);
   return NextResponse.json(refs);
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-
-  if (!body.name || !body.description || !body.type) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
     return NextResponse.json(
-      { error: "name, description, and type are required" },
+      { error: "Invalid JSON body" },
       { status: 400 }
     );
   }
 
-  const ref = createReference({
-    name: body.name,
-    description: body.description,
-    type: body.type,
-    tags: Array.isArray(body.tags) ? body.tags : [],
-    nodes: Array.isArray(body.nodes) ? body.nodes : [],
-    version: body.version,
-  });
+  const validation = validateCreateReferenceInput(body);
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: validation.status ?? 400 });
+  }
+
+  const ref = await createReference(validation.data);
 
   return NextResponse.json(ref, { status: 201 });
 }

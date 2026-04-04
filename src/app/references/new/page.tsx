@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ReferenceNode } from "@/types/reference";
+import { Reference, ReferenceNode, ReferenceType } from "@/types/reference";
 import NodeEditor from "@/components/NodeEditor";
+import { usesFreeTextReference } from "@/lib/reference-types";
 
 const TYPES = [
   { value: "ontology", label: "Ontology" },
@@ -11,11 +12,125 @@ const TYPES = [
   { value: "model", label: "Model" },
   { value: "schema", label: "Schema" },
   { value: "configuration", label: "Configuration" },
+  { value: "markdown", label: "Markdown" },
   { value: "other", label: "Other" },
 ];
 
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isReferenceType(value: unknown): value is ReferenceType {
+  return (
+    typeof value === "string" &&
+    ["ontology", "taxonomy", "model", "schema", "configuration", "markdown", "other"].includes(
+      value
+    )
+  );
+}
+
+function normalizeTags(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .filter((item): item is string => typeof item === "string")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function toOptionalString(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  return undefined;
+}
+
+function mapValueToNode(value: unknown, fallbackName: string): ReferenceNode {
+  if (Array.isArray(value)) {
+    return {
+      id: generateId(),
+      name: fallbackName,
+      type: "collection",
+      description: `Array (${value.length} item${value.length !== 1 ? "s" : ""})`,
+      children: value.map((item, index) => mapValueToNode(item, `Item ${index + 1}`)),
+    };
+  }
+
+  if (isRecord(value)) {
+    const knownNodeShape =
+      typeof value.name === "string" ||
+      typeof value.description === "string" ||
+      typeof value.type === "string" ||
+      "children" in value;
+
+    if (knownNodeShape) {
+      const nodeName = toOptionalString(value.name) ?? fallbackName;
+      const nodeDescription = toOptionalString(value.description);
+      const nodeType = toOptionalString(value.type);
+      const nodeValue = toOptionalString(value.value);
+      const children = Array.isArray(value.children)
+        ? value.children.map((child, index) =>
+            mapValueToNode(child, `${nodeName} child ${index + 1}`)
+          )
+        : [];
+
+      return {
+        id: generateId(),
+        name: nodeName,
+        type: nodeType,
+        description: nodeDescription,
+        value: nodeValue,
+        children,
+      };
+    }
+
+    const children = Object.entries(value).map(([key, childValue]) =>
+      mapValueToNode(childValue, key)
+    );
+    return {
+      id: generateId(),
+      name: fallbackName,
+      type: "object",
+      children,
+    };
+  }
+
+  return {
+    id: generateId(),
+    name: fallbackName,
+    type: "value",
+    value: toOptionalString(value) ?? "",
+    children: [],
+  };
+}
+
+function mapJsonToNodes(value: unknown): ReferenceNode[] {
+  if (Array.isArray(value)) {
+    return value.map((item, index) => mapValueToNode(item, `Root ${index + 1}`));
+  }
+  if (isRecord(value)) {
+    return Object.entries(value).map(([key, entryValue]) => mapValueToNode(entryValue, key));
+  }
+  return [mapValueToNode(value, "Root")];
+}
+
+function countNodes(nodes: ReferenceNode[]): number {
+  return nodes.reduce((total, node) => total + 1 + countNodes(node.children ?? []), 0);
 }
 
 export default function NewReferencePage() {
@@ -27,10 +142,31 @@ export default function NewReferencePage() {
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [nodes, setNodes] = useState<ReferenceNode[]>([]);
+  const [content, setContent] = useState("");
   const [aiPrompt, setAiPrompt] = useState("");
+  const [copyFromId, setCopyFromId] = useState("");
+  const [availableReferences, setAvailableReferences] = useState<Reference[]>([]);
+  const [importMessage, setImportMessage] = useState("");
+  const [importError, setImportError] = useState("");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const selectedReferenceId = new URLSearchParams(window.location.search).get(
+      "copyFromId"
+    );
+    if (selectedReferenceId) {
+      setCopyFromId(selectedReferenceId);
+    }
+  }, []);
   const [aiLoading, setAiLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetch("/api/references")
+      .then((r) => r.json())
+      .then((refs: Reference[]) => setAvailableReferences(refs))
+      .catch(() => setAvailableReferences([]));
+  }, []);
 
   const addTag = useCallback(() => {
     const t = tagInput.trim().toLowerCase();
@@ -59,14 +195,18 @@ export default function NewReferencePage() {
   }, []);
 
   const handleAiGenerate = useCallback(async () => {
-    if (!aiPrompt.trim()) return;
+    if (!aiPrompt.trim() && !copyFromId) return;
     setAiLoading(true);
     setError("");
     try {
       const res = await fetch("/api/ai/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: aiPrompt }),
+        body: JSON.stringify({
+          description: aiPrompt || "Rebuild this reference from the selected source",
+          baseReferenceId: copyFromId || undefined,
+          rewriteFromBase: Boolean(copyFromId),
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -75,6 +215,7 @@ export default function NewReferencePage() {
         if (data.type) setType(data.type);
         if (data.version) setVersion(data.version);
         if (Array.isArray(data.tags)) setTags(data.tags);
+        if (typeof data.content === "string") setContent(data.content);
         if (Array.isArray(data.nodes)) setNodes(data.nodes);
       } else {
         setError(data.error ?? "AI generation failed");
@@ -83,7 +224,90 @@ export default function NewReferencePage() {
       setError("Failed to call AI service");
     }
     setAiLoading(false);
-  }, [aiPrompt]);
+  }, [aiPrompt, copyFromId]);
+
+  const handleJsonImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setImportError("");
+    setImportMessage("");
+    setError("");
+
+    try {
+      const text = await file.text();
+      const parsed: unknown = JSON.parse(text);
+      const rootObject = isRecord(parsed) ? parsed : undefined;
+
+      const importedName = toOptionalString(rootObject?.name);
+      const importedDescription = toOptionalString(rootObject?.description);
+      const importedType = rootObject && isReferenceType(rootObject.type) ? rootObject.type : undefined;
+      const importedVersion = toOptionalString(rootObject?.version);
+      const importedTags = normalizeTags(rootObject?.tags);
+      const importedContent =
+        toOptionalString(rootObject?.content) ??
+        toOptionalString(rootObject?.markdown) ??
+        toOptionalString(rootObject?.text) ??
+        toOptionalString(rootObject?.body);
+
+      if (importedName) setName(importedName);
+      if (importedDescription) setDescription(importedDescription);
+      if (importedType) setType(importedType);
+      if (importedVersion) setVersion(importedVersion);
+      if (importedTags.length > 0) setTags(importedTags);
+
+      const effectiveType = importedType ?? type;
+
+      if (usesFreeTextReference(effectiveType)) {
+        setContent(importedContent ?? JSON.stringify(parsed, null, 2));
+        setNodes([]);
+        setImportMessage(`Imported ${file.name}. Content mapped to free text editor.`);
+      } else {
+        // Collect all structural sources including nodes, metadata, etc.
+        const structuredSources: unknown[] = [];
+        
+        // Primary source: explicit nodes
+        if (rootObject && "nodes" in rootObject && Array.isArray(rootObject.nodes)) {
+          structuredSources.push(...rootObject.nodes);
+        }
+        
+        // Secondary source: structure field
+        if (rootObject && "structure" in rootObject) {
+          structuredSources.push(rootObject.structure);
+        }
+        
+        // Tertiary source: metadata (captured but separate from nodes)
+        if (rootObject && "metadata" in rootObject && isRecord(rootObject.metadata)) {
+          const metadataNode: ReferenceNode = {
+            id: generateId(),
+            name: "Metadata",
+            type: "metadata",
+            description: "Schema and API parameter documentation",
+            children: Object.entries(rootObject.metadata).map(([key, value]) =>
+              mapValueToNode(value, key)
+            ),
+          };
+          structuredSources.push(metadataNode);
+        }
+        
+        // If no structured sources found, try full parse
+        if (structuredSources.length === 0) {
+          structuredSources.push(parsed);
+        }
+        
+        const mappedNodes = mapJsonToNodes(structuredSources);
+        setNodes(mappedNodes);
+        setContent("");
+        setImportMessage(
+          `Imported ${file.name}. Mapped ${countNodes(mappedNodes)} node${countNodes(mappedNodes) !== 1 ? "s" : ""} (including metadata).`
+        );
+      }
+    } catch {
+      setImportError("Could not parse JSON file. Please upload a valid .json file.");
+    } finally {
+      event.target.value = "";
+    }
+  }, [type]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -98,7 +322,15 @@ export default function NewReferencePage() {
         const res = await fetch("/api/references", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, description, type, version, tags, nodes }),
+          body: JSON.stringify({
+            name,
+            description,
+            type,
+            version,
+            tags,
+            nodes: usesFreeTextReference(type) ? [] : nodes,
+            content: usesFreeTextReference(type) ? content : undefined,
+          }),
         });
         const data = await res.json();
         if (res.ok) {
@@ -111,11 +343,11 @@ export default function NewReferencePage() {
       }
       setSaving(false);
     },
-    [name, description, type, version, tags, nodes, router]
+    [name, description, type, version, tags, nodes, content, router]
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-[1120px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">New Reference</h1>
         <p className="text-sm text-gray-500 mt-1">
@@ -130,25 +362,63 @@ export default function NewReferencePage() {
         </h2>
         <p className="text-sm text-indigo-700 mb-3">
           Describe the reference you want to create in natural language, and the AI agent
-          will pre-populate the fields below for you to review and adjust.
+          will pre-populate the fields below for you to review and adjust. You can also pick
+          an existing reference as a starting point for a full rebuild.
         </p>
+        <div className="mb-3">
+          <label className="block text-xs font-medium text-indigo-800 mb-1">
+            Start From Existing Reference (optional)
+          </label>
+          <select
+            value={copyFromId}
+            onChange={(e) => setCopyFromId(e.target.value)}
+            className="w-full border border-indigo-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option value="">None</option>
+            {availableReferences.map((ref) => (
+              <option key={ref.id} value={ref.id}>
+                {ref.name} ({ref.type})
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="flex gap-2">
           <textarea
             value={aiPrompt}
             onChange={(e) => setAiPrompt(e.target.value)}
-            placeholder="e.g. A taxonomy for classifying software service types in a cloud-native platform, including microservices, serverless functions, and managed services with their configuration properties."
+            placeholder="e.g. Expand this taxonomy with governance controls and observability patterns."
             className="flex-1 border border-indigo-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             rows={3}
           />
           <button
             type="button"
             onClick={handleAiGenerate}
-            disabled={aiLoading || !aiPrompt.trim()}
+            disabled={aiLoading || (!aiPrompt.trim() && !copyFromId)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors self-start whitespace-nowrap"
           >
             {aiLoading ? "Generating…" : "Generate"}
           </button>
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+        <h2 className="font-semibold text-gray-800 mb-1">Import From JSON</h2>
+        <p className="text-sm text-gray-500 mb-3">
+          Upload a JSON file and the form will auto-map supported fields (name,
+          description, type, version, tags, content, and structure nodes).
+        </p>
+        <input
+          type="file"
+          accept="application/json,.json"
+          onChange={handleJsonImport}
+          className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {importMessage && (
+          <p className="text-xs text-green-700 mt-2">{importMessage}</p>
+        )}
+        {importError && (
+          <p className="text-xs text-red-700 mt-2">{importError}</p>
+        )}
       </div>
 
       {error && (
@@ -268,7 +538,23 @@ export default function NewReferencePage() {
           </div>
         </div>
 
-        {/* Nodes Editor */}
+        {usesFreeTextReference(type) ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="mb-4">
+            <h2 className="font-semibold text-gray-800">Reference Content</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Paste or write the free text content for this reference.
+            </p>
+          </div>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={16}
+            placeholder={type === "markdown" ? "Paste markdown content here" : "Paste free text content here"}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        ) : (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -291,27 +577,30 @@ export default function NewReferencePage() {
               <p className="text-sm">No nodes yet. Add a root node or use AI generation.</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {nodes.map((node, idx) => (
-                <NodeEditor
-                  key={node.id}
-                  node={node}
-                  depth={0}
-                  onUpdate={(updated) => {
-                    setNodes((prev) => {
-                      const copy = [...prev];
-                      copy[idx] = updated;
-                      return copy;
-                    });
-                  }}
-                  onDelete={() => {
-                    setNodes((prev) => prev.filter((_, i) => i !== idx));
-                  }}
-                />
-              ))}
+            <div className="overflow-x-auto">
+              <div className="space-y-2 min-w-max">
+                {nodes.map((node, idx) => (
+                  <NodeEditor
+                    key={node.id}
+                    node={node}
+                    depth={0}
+                    onUpdate={(updated) => {
+                      setNodes((prev) => {
+                        const copy = [...prev];
+                        copy[idx] = updated;
+                        return copy;
+                      });
+                    }}
+                    onDelete={() => {
+                      setNodes((prev) => prev.filter((_, i) => i !== idx));
+                    }}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>
+        )}
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-3">

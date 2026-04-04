@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findReferenceById, updateReference, deleteReference } from "@/lib/store";
+import { validateUpdateReferenceInput } from "@/lib/reference-validation";
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const ref = findReferenceById(id);
+  const ref = await findReferenceById(id);
   if (!ref) {
     return NextResponse.json({ error: "Reference not found" }, { status: 404 });
   }
@@ -18,8 +19,20 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const body = await request.json();
-  const updated = updateReference(id, body);
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const validation = validateUpdateReferenceInput(body);
+  if (!validation.ok) {
+    return NextResponse.json({ error: validation.error }, { status: validation.status ?? 400 });
+  }
+
+  const updated = await updateReference(id, validation.data);
   if (!updated) {
     return NextResponse.json({ error: "Reference not found" }, { status: 404 });
   }
@@ -31,7 +44,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const deleted = deleteReference(id);
+  const deleted = await deleteReference(id);
   if (!deleted) {
     return NextResponse.json({ error: "Reference not found" }, { status: 404 });
   }

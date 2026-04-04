@@ -3,24 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Reference } from "@/types/reference";
-
-const TYPE_LABELS: Record<string, string> = {
-  ontology: "Ontology",
-  taxonomy: "Taxonomy",
-  model: "Model",
-  schema: "Schema",
-  configuration: "Configuration",
-  other: "Other",
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  ontology: "bg-purple-100 text-purple-700",
-  taxonomy: "bg-green-100 text-green-700",
-  model: "bg-blue-100 text-blue-700",
-  schema: "bg-yellow-100 text-yellow-700",
-  configuration: "bg-orange-100 text-orange-700",
-  other: "bg-gray-100 text-gray-700",
-};
+import { TYPE_COLORS, TYPE_LABELS, usesFreeTextReference } from "@/lib/reference-types";
 
 export default function HomePage() {
   const [references, setReferences] = useState<Reference[]>([]);
@@ -148,49 +131,58 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {references.map((ref) => (
-              <Link
+              <div
                 key={ref.id}
-                href={`/references/${ref.id}`}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-blue-300 transition-all group"
+                className="relative bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-blue-300 transition-all group"
               >
-                <div className="flex items-start justify-between mb-2">
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                      TYPE_COLORS[ref.type] ?? TYPE_COLORS.other
-                    }`}
-                  >
-                    {TYPE_LABELS[ref.type] ?? ref.type}
-                  </span>
-                  <span className="text-xs text-gray-400">{ref.version}</span>
-                </div>
-                <h2 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
-                  {ref.name}
-                </h2>
-                <p className="text-sm text-gray-500 line-clamp-2 mb-3">
-                  {ref.description}
-                </p>
-                {ref.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {ref.tags.slice(0, 4).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {ref.tags.length > 4 && (
-                      <span className="text-xs text-gray-400">
-                        +{ref.tags.length - 4}
-                      </span>
-                    )}
+                <Link href={`/references/${ref.id}`} className="block p-5 pb-11">
+                  <div className="flex items-start justify-between mb-2">
+                    <span
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        TYPE_COLORS[ref.type] ?? TYPE_COLORS.other
+                      }`}
+                    >
+                      {TYPE_LABELS[ref.type] ?? ref.type}
+                    </span>
+                    <span className="text-xs text-gray-400">{ref.version}</span>
                   </div>
-                )}
-                <p className="text-xs text-gray-400 mt-3">
-                  {ref.nodes.length} node{ref.nodes.length !== 1 ? "s" : ""} ·{" "}
-                  {new Date(ref.updatedAt).toLocaleDateString()}
-                </p>
-              </Link>
+                  <h2 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1 truncate">
+                    {ref.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 line-clamp-2 mb-3">
+                    {ref.description}
+                  </p>
+                  {ref.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {ref.tags.slice(0, 4).map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {ref.tags.length > 4 && (
+                        <span className="text-xs text-gray-400">
+                          +{ref.tags.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 mt-3">
+                    {usesFreeTextReference(ref.type)
+                      ? "free text"
+                      : `${ref.nodes.length} node${ref.nodes.length !== 1 ? "s" : ""}`} ·{" "}
+                    {new Date(ref.updatedAt).toLocaleDateString()}
+                  </p>
+                </Link>
+                <Link
+                  href={`/references/new?copyFromId=${encodeURIComponent(ref.id)}`}
+                  className="absolute bottom-3.5 right-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2.5 py-1 bg-white border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 shadow-sm"
+                >
+                  + New from this
+                </Link>
+              </div>
             ))}
           </div>
         </>

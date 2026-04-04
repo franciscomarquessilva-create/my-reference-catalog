@@ -1,0 +1,33 @@
+services:
+
+  my-reference-catalog:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-reference-catalog
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - AI_MODEL=${AI_MODEL:-gpt-5.2}
+    volumes:
+      - ./data:/app/data
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.my-reference-catalog.rule=Host(`my-reference-catalog.aiops3000.com`)"
+      - "traefik.http.routers.my-reference-catalog.entrypoints=web"
+      - "traefik.http.services.my-reference-catalog.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  proxy:
+    external: true

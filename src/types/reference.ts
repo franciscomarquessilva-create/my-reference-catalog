@@ -1,3 +1,12 @@
+export type ReferenceType =
+  | "ontology"
+  | "taxonomy"
+  | "model"
+  | "schema"
+  | "configuration"
+  | "markdown"
+  | "other";
+
 export interface ReferenceNode {
   id: string;
   name: string;
@@ -11,9 +20,10 @@ export interface Reference {
   id: string;
   name: string;
   description: string;
-  type: "ontology" | "taxonomy" | "model" | "schema" | "configuration" | "other";
+  type: ReferenceType;
   tags: string[];
   nodes: ReferenceNode[];
+  content?: string;
   createdAt: string;
   updatedAt: string;
   version: string;
@@ -22,9 +32,10 @@ export interface Reference {
 export interface CreateReferenceInput {
   name: string;
   description: string;
-  type: Reference["type"];
+  type: ReferenceType;
   tags: string[];
   nodes: ReferenceNode[];
+  content?: string;
   version?: string;
 }
 

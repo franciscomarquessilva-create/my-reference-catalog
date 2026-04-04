@@ -1,4 +1,5 @@
 import { Reference, ReferenceNode } from "@/types/reference";
+import { usesFreeTextReference } from "@/lib/reference-types";
 
 function nodeToMarkdown(node: ReferenceNode, depth: number): string {
   const indent = "#".repeat(depth + 3);
@@ -17,6 +18,10 @@ function nodeToMarkdown(node: ReferenceNode, depth: number): string {
 }
 
 export function referenceToMarkdown(ref: Reference): string {
+  if (ref.type === "markdown" && ref.content?.trim()) {
+    return ref.content;
+  }
+
   let md = `# ${ref.name}\n\n`;
   md += `> ${ref.description}\n\n`;
   md += `| Field | Value |\n`;
@@ -30,6 +35,10 @@ export function referenceToMarkdown(ref: Reference): string {
 
   if (ref.tags.length > 0) {
     md += `**Tags:** ${ref.tags.map((t) => `\`${t}\``).join(", ")}\n\n`;
+  }
+
+  if (usesFreeTextReference(ref.type) && ref.content?.trim()) {
+    md += `## Content\n\n${ref.content}\n\n`;
   }
 
   if (ref.nodes.length > 0) {
@@ -51,6 +60,7 @@ export function referenceToJson(ref: Reference): object {
     type: ref.type,
     version: ref.version,
     tags: ref.tags,
+    content: ref.content,
     createdAt: ref.createdAt,
     updatedAt: ref.updatedAt,
     nodes: ref.nodes,
