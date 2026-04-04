@@ -1,134 +1,119 @@
-# Deployment Configuration for fraserver01
+# Deployment Configuration
 
-This guide covers deploying my-reference-catalog using the Traefik + Cloudflare Tunnel infrastructure.
+This guide covers deploying my-reference-catalog using Docker, with optional Traefik reverse proxy support.
 
 ## Prerequisites
 
-- [ ] SSH access to fraserver01 (user: francis)
-- [ ] Docker & Docker Compose installed on fraserver01
-- [ ] Traefik already running on fraserver01 with `proxy` network
-- [ ] Cloudflare Tunnel configured for `*.aiops3000.com`
-- [ ] PowerShell (v5.0+) on your local machine (Windows)
+- [ ] SSH access to your remote server
+- [ ] Docker & Docker Compose installed on the server
+- [ ] (Optional) Traefik already running on the server with a `proxy` network
+- [ ] PowerShell (v5.0+) on your local machine (Windows) — for the included scripts
 
 ## Before First Deployment
 
-### 1. Test SSH Connection
-
-```powershell
-ssh francis@fraserver01 "docker network ls | grep proxy"
-```
-
-Should see output with `proxy` network. If not, you need to create it on the server:
+### 1. Configure environment
 
 ```bash
-docker network create proxy
+cp .env.example .env
+# Edit .env with your OPENAI_API_KEY and APP_HOSTNAME
 ```
 
-### 2. Create App Directory on Server
+### 2. Test SSH connection
 
 ```bash
-ssh francis@fraserver01 "mkdir -p /srv/my-reference-catalog"
+ssh user@your-server "docker --version"
 ```
 
-### 3. Verify Traefik Configuration
-
-On fraserver01, ensure Traefik is configured to watch Docker:
+### 3. Create app directory on server
 
 ```bash
-docker logs traefik | grep "docker"
+ssh user@your-server "mkdir -p /srv/my-reference-catalog"
 ```
 
-Should show provider configuration messages.
+### 4. (Optional) Create Traefik proxy network
+
+If using Traefik, ensure the `proxy` network exists on the server:
+
+```bash
+ssh user@your-server "docker network create proxy"
+```
 
 ## Deployment
 
 ### Method 1: Using the Batch Script (Recommended for Windows)
 
 ```batch
-dp_remote.bat
+dp_remote.bat -Server your-server -User your-user
 ```
 
 This will:
 1. Verify SSH connection
-2. Copy all necessary files to fraserver01
+2. Copy all necessary files to the server
 3. Build the Docker image
-4. Start the container with Traefik labels
+4. Start the container
 5. Run health checks
 
 ### Method 2: Using PowerShell Directly
 
 ```powershell
-.\deploy.ps1 -Server fraserver01 -User francis
+.\deploy.ps1 -Server your-server -User your-user
 ```
 
 ### Method 3: Manual SSH Deployment
 
 ```bash
 # Copy files
-scp -r . francis@fraserver01:/srv/my-reference-catalog/
+scp -r . user@your-server:/srv/my-reference-catalog/
 
 # Connect and deploy
-ssh francis@fraserver01
+ssh user@your-server
 cd /srv/my-reference-catalog
 ./deploy-remote.sh
 ```
 
 ## Verifying Deployment
 
-Once deployment completes, verify the application:
-
-### From Your Machine
-
 ```bash
-# Check DNS resolution
-dig my-reference-catalog.aiops3000.com
+# Check container status
+docker ps | grep my-reference-catalog
 
-# Test the endpoint
-curl https://my-reference-catalog.aiops3000.com
-```
-
-### On fraserver01
-
-```bash
 # View container logs
 docker logs my-reference-catalog
 
-# Check Traefik routing
-docker logs traefik | grep my-reference-catalog
-
-# View container status
-docker ps
+# Test the endpoint
+curl http://localhost:3000
 ```
 
 ## Environment Variables
 
-Create a `.env` file locally if needed for build-time configuration:
+| Variable | Required | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | No | Enables LLM generation/augmentation when set |
+| `AI_MODEL` | No | Default model for LLM calls. Defaults to `gpt-4o` |
+| `APP_HOSTNAME` | No | Hostname for Traefik routing (e.g. `my-catalog.example.com`) |
+| `NODE_ENV` | No | Standard Node runtime mode |
 
-```bash
-NODE_ENV=production
-```
-
-The docker-compose.yml automatically sets this for the container.
+See `.env.example` for a template.
 
 ## Container Details
 
 - **Image**: Built from local Dockerfile (multi-stage: Node.js 20 Alpine)
-- **Port**: Exposed on 3000 (internal), routed via Traefik
+- **Port**: Exposed on 3000 (internal), optionally routed via Traefik
 - **Service Name**: `my-reference-catalog`
-- **Hostname**: `my-reference-catalog.aiops3000.com`
 - **Restart Policy**: `unless-stopped`
-- **Network**: `proxy` (existing shared Traefik network)
+- **Network**: `proxy` (existing shared Traefik network, if using Traefik)
 
-## Traefik Labels Explained
+## Traefik Labels
 
-The Docker labels in `docker-compose.yml` tell Traefik:
+The Docker labels in `docker-compose.yml` tell Traefik how to route requests.
+The hostname is read from the `APP_HOSTNAME` environment variable:
 
 ```yaml
 labels:
-  - "traefik.enable=true"                                    # Enable routing for this service
-  - "traefik.http.routers.my-reference-catalog.rule=Host(`my-reference-catalog.aiops3000.com`)"  # Match hostname
-  - "traefik.http.routers.my-reference-catalog.entrypoints=web"  # Listen on web (80)
-  - "traefik.http.services.my-reference-catalog.loadbalancer.server.port=3000"  # Forward to port 3000
+  - "traefik.enable=true"
+  - "traefik.http.routers.my-reference-catalog.rule=Host(`${APP_HOSTNAME:-my-reference-catalog.example.com}`)"
+  - "traefik.http.routers.my-reference-catalog.entrypoints=web"
+  - "traefik.http.services.my-reference-catalog.loadbalancer.server.port=3000"
 ```
 
 ## Troubleshooting
@@ -136,22 +121,14 @@ labels:
 ### Container won't start
 
 ```bash
-ssh francis@fraserver01
 docker logs my-reference-catalog
-```
-
-### DNS resolution fails
-
-```bash
-# On fraserver01
-docker logs cloudflared
 ```
 
 ### Traefik not routing traffic
 
 ```bash
 # Check Traefik dashboard
-curl http://fraserver01:8080/dashboard/
+curl http://your-server:8080/dashboard/
 
 # Verify labels were picked up
 docker inspect my-reference-catalog | grep -A 20 Labels
@@ -160,7 +137,6 @@ docker inspect my-reference-catalog | grep -A 20 Labels
 ### Need to rebuild
 
 ```bash
-ssh francis@fraserver01
 cd /srv/my-reference-catalog
 docker compose build --no-cache
 docker compose up -d
@@ -171,7 +147,6 @@ docker compose up -d
 Backups are automatically created in `/srv/my-reference-catalog-backups/`:
 
 ```bash
-ssh francis@fraserver01
 cd /srv/my-reference-catalog
 docker compose down
 
@@ -199,21 +174,7 @@ Look for `(healthy)` or `(unhealthy)` in the STATUS column.
 ## Performance Notes
 
 - Multi-stage Docker build reduces image size
-- Node.js 20 Alpine base (~150MB)
+- Node.js 20 Alpine base (~150 MB)
 - Production npm packages only (no devDependencies)
-- Dumb-init ensures proper signal handling
+- `dumb-init` ensures proper signal handling
 - Health checks verify container responsiveness
-
-## Next Steps
-
-1. Run `dp_remote.bat` to deploy
-2. Wait ~60 seconds for container startup
-3. Visit `https://my-reference-catalog.aiops3000.com`
-4. Monitor logs: `ssh francis@fraserver01 "docker logs -f my-reference-catalog"`
-
-## Support
-
-For issues with:
-- **Traefik/routing**: Check Traefik dashboard or logs
-- **Container**: Review `docker logs my-reference-catalog`
-- **SSH/Connection**: Verify `ssh -v francis@fraserver01 "echo test"`

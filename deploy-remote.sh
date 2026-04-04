@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deployment script for my-reference-catalog on fraserver01
+# Deployment script for my-reference-catalog
 # This script runs on the remote server
 
 set -e
@@ -62,4 +62,4 @@ echo "📊 Container status:"
 docker compose ps
 
 echo "✨ Deployment complete!"
-echo "🌐 Access at: https://my-reference-catalog.aiops3000.com"
+echo "🌐 Access at: http://localhost:3000 (or your configured hostname)"

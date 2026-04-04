@@ -1,10 +1,11 @@
 @echo off
 REM Batch deployment script wrapper
 REM This calls the PowerShell deployment script
+REM Usage: dp_remote.bat -Server your-server -User your-user
 
 setlocal enabledelayedexpansion
 
-echo Deploying my-reference-catalog to fraserver01...
+echo Deploying my-reference-catalog...
 echo.
 
 REM Check if running from the correct directory

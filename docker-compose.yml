@@ -18,7 +18,7 @@ services:
       - proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.my-reference-catalog.rule=Host(`my-reference-catalog.aiops3000.com`)"
+      - "traefik.http.routers.my-reference-catalog.rule=Host(`${APP_HOSTNAME:-my-reference-catalog.example.com}`)"
       - "traefik.http.routers.my-reference-catalog.entrypoints=web"
       - "traefik.http.services.my-reference-catalog.loadbalancer.server.port=3000"
     healthcheck:

@@ -39,7 +39,7 @@ Open `http://localhost:3000`.
 | Variable | Required | Description |
 | --- | --- | --- |
 | `OPENAI_API_KEY` | No | Enables LLM generation/augmentation when set. |
-| `AI_MODEL` | No | Default model for LLM calls. Defaults to `gpt-5.2`. |
+| `AI_MODEL` | No | Default model for LLM calls. Defaults to `gpt-4o`. |
 | `NODE_ENV` | No | Standard Node runtime mode. |
 
 If no API key is configured, AI generation falls back to a local heuristic mode.
