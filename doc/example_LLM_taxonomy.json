@@ -292,7 +292,7 @@
                   "children": [
                     {
                       "id": "8a8mzdri",
-                      "name": "claude-3-opus",
+                      "name": "claude-3-opus-20240229",
                       "type": "llm-model",
                       "description": "Highest-capability Claude 3 tier. Retired/deprecated.",
                       "value": "legacy",
@@ -300,7 +300,7 @@
                     },
                     {
                       "id": "evcdph6b",
-                      "name": "claude-3-sonnet",
+                      "name": "claude-3-sonnet-20240229",
                       "type": "llm-model",
                       "description": "Balanced Claude 3 tier. Legacy; superseded by claude-3.5-sonnet.",
                       "value": "legacy",
@@ -308,7 +308,7 @@
                     },
                     {
                       "id": "142w1mc0",
-                      "name": "claude-3-haiku",
+                      "name": "claude-3-haiku-20240307",
                       "type": "llm-model",
                       "description": "Fast, lower-cost Claude 3 tier. Legacy; superseded by claude-3.5-haiku.",
                       "value": "legacy",
@@ -324,7 +324,7 @@
                   "children": [
                     {
                       "id": "c0zsf9kt",
-                      "name": "claude-3.5-sonnet",
+                      "name": "claude-3-5-sonnet-20241022",
                       "type": "llm-model",
                       "description": "Strong coding and general assistant quality; widely used production model.",
                       "value": "stable",
@@ -332,7 +332,7 @@
                     },
                     {
                       "id": "96wzkklo",
-                      "name": "claude-3.5-haiku",
+                      "name": "claude-3-5-haiku-20241022",
                       "type": "llm-model",
                       "description": "Faster, cost-optimized tier for throughput-sensitive assistants and extraction.",
                       "value": "stable",
@@ -348,7 +348,7 @@
                   "children": [
                     {
                       "id": "pn85u172",
-                      "name": "claude-3.7-sonnet",
+                      "name": "claude-3-7-sonnet-20250219",
                       "type": "llm-model",
                       "description": "Hybrid-reasoning Sonnet model; supports extended thinking mode.",
                       "value": "stable",
@@ -364,7 +364,7 @@
                   "children": [
                     {
                       "id": "rwaen0y6",
-                      "name": "claude-opus-4",
+                      "name": "claude-opus-4-0",
                       "type": "llm-model",
                       "description": "Highest-capability Claude 4 tier.",
                       "value": "stable",
@@ -372,7 +372,7 @@
                     },
                     {
                       "id": "wsg14v33",
-                      "name": "claude-sonnet-4",
+                      "name": "claude-sonnet-4-0",
                       "type": "llm-model",
                       "description": "Balanced Claude 4 tier.",
                       "value": "stable",
@@ -380,7 +380,7 @@
                     },
                     {
                       "id": "vkc5k4ia",
-                      "name": "claude-haiku-4",
+                      "name": "claude-haiku-4-0",
                       "type": "llm-model",
                       "description": "Fast, cost-efficient Claude 4 tier.",
                       "value": "stable",
@@ -396,7 +396,7 @@
                   "children": [
                     {
                       "id": "zzwjhz8g",
-                      "name": "claude-opus-4.5",
+                      "name": "claude-opus-4-5",
                       "type": "llm-model",
                       "description": "Top-tier Claude 4.5 model.",
                       "value": "stable",
@@ -404,7 +404,7 @@
                     },
                     {
                       "id": "6ldbp799",
-                      "name": "claude-sonnet-4.5",
+                      "name": "claude-sonnet-4-5",
                       "type": "llm-model",
                       "description": "Production-default Sonnet; industry-leading coding and computer use.",
                       "value": "stable",
@@ -412,7 +412,7 @@
                     },
                     {
                       "id": "3tjkzs58",
-                      "name": "claude-haiku-4.5",
+                      "name": "claude-haiku-4-5-20251001",
                       "type": "llm-model",
                       "description": "Fastest, most cost-efficient Claude 4.5 tier.",
                       "value": "stable",
@@ -428,7 +428,7 @@
                   "children": [
                     {
                       "id": "966a6nth",
-                      "name": "claude-opus-4.6",
+                      "name": "claude-opus-4-6",
                       "type": "llm-model",
                       "description": "Most capable production model as of March 2026; adaptive thinking, 1M token context, 128k max output.",
                       "value": "stable",
@@ -436,7 +436,7 @@
                     },
                     {
                       "id": "2t4yr3ii",
-                      "name": "claude-sonnet-4.6",
+                      "name": "claude-sonnet-4-6",
                       "type": "llm-model",
                       "description": "Latest Sonnet; near-Opus 4.5 coding quality at Sonnet pricing. 1M context window in beta.",
                       "value": "stable",
